@@ -1,4 +1,4 @@
 resource "tfe_project" "test" {
   organization = "ConseilsTI"
-  name = "test"
+  name = "test1"
 }
