@@ -1,6 +1,6 @@
 # This workflow runs manually.
 #
-# `Create Terraform Module` job run Terraform Cloud API call to retrieve the workspace id.
+# `Create Terraform Project` job run Terraform Cloud API call to retrieve the workspace id.
 # It then uses API calls to find the variable ID and value. After several validations, it
 # updates the variable in Terraform Cloud using an API call.
 #
@@ -24,24 +24,24 @@
 #     - https://www.terraform.io/docs/cloud/users-teams-organizations/api-tokens.html
 #     - https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets
 
-name: "Create Terraform Module"
+name: "Create Terraform Project"
 
 on: # yamllint disable-line rule:truthy
   workflow_dispatch:
     inputs:
-      module_name:
-        description: The name of the module to create. Module name must use a three-part name format like `terraform-<PROVIDER>-<NAME>` and contain only alphanumeric and hypens.
+      project_name:
+        description: The name of the project to create.
         required: true
         type: string
 
 jobs:
   job:
-    name: Create Terraform Module
+    name: Create Terraform Project
     runs-on: ubuntu-latest
     env:
       TF_API_TOKEN: ${{ secrets.TFC_API_TOKEN }}
       TF_CLOUD_ORGANIZATION: ConseilsTI
-      TF_VARIABLE: module_names
+      TF_VARIABLE: project_names
     steps:
 
       - name: Get workspace ID
@@ -100,24 +100,18 @@ jobs:
           auth_header="Authorization: Bearer ${TF_API_TOKEN}"
           content_header="Content-Type: application/vnd.api+json"
           variable_value=$(echo -e "${{ steps.get_variable.outputs.variable_value }}")
-          if [[ "${{ github.event.inputs.module_name }}" =~ ^terraform-[a-zA-Z]+-[a-zA-Z0-9-]+$ ]]; then
-            echo "INFO     | Module's name use a three-part name format like \"terraform-<PROVIDER>-<NAME>\" and contain only alphanumeric and hypens."
-          else
-            echo "ERROR    | Module's name must use a three-part name format like \"terraform-<PROVIDER>-<NAME>\" and contain only alphanumeric and hypens."
-            exit 1
-          fi
           if [[ "${variable_value}" =~ ^\[.*\]$ ]]; then
             echo "INFO     | Variable is an array."
           else
             echo "ERROR    | Variable is not an array."
             exit 1
           fi
-          if [[ "${variable_value}" =~ "${{ github.event.inputs.module_name }}" ]]; then
-            echo "ERROR    | Module's name is already in use."
+          if [[ "${variable_value}" =~ "${{ github.event.inputs.project_name }}" ]]; then
+            echo "ERROR    | Project's name is already in use."
             exit 1
           fi
-          echo "INFO     | Adding new module's name into the array."
-          variable_value="${variable_value::-1}, \"${{ github.event.inputs.module_name }}\"]"
+          echo "INFO     | Adding new project's name into the array."
+          variable_value="${variable_value::-1}, \"${{ github.event.inputs.project_name }}\"]"
           printf 'INFO     | Converting \\" into \\\\".'
           variable_value=${variable_value//\"/\\\"}
           echo "INFO     | Building JSON payload."
