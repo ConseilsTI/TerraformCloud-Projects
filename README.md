@@ -8,9 +8,9 @@ workspace that would provision and manage the configuration using Terraform code
 
 ## Permissions
 
-To manage the resources from that code, provide a token from an account with
-`owner` permissions. Alternatively, you can use a token from the `owner` team
-instead of a user token.
+To manage the Terraform Cloud projects from that code, provide a token from an
+account with `manage all projects` and `manage teams` access. Alternatively, you
+can use a token from a team with that access instead of a user token.
 
 To manage secrets in Hashicorp Vault Secrets, provide a client ID and a key
 from a service principals with the secret `contributor` role.
