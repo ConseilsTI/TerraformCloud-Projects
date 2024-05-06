@@ -25,7 +25,14 @@ resource "tfe_team_project_access" "this" {
   team_id    = tfe_team.this[each.key].id
 }
 
+# The following code blode is used to create secret in Hashicorp Vault.
 
+resource "hcp_vault_secrets_secret" "this" {
+  for_each     = tfe_project.this
+  app_name     = hcp_vault_secrets_app.this.app_name
+  secret_name  = tfe_team.this[each.key].name
+  secret_value = tfe_team_token.this[each.key].token
+}
 
 
 
