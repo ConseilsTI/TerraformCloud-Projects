@@ -15,5 +15,5 @@ output "team_id" {
 
 output "team_project_access" {
   description = "The team project access attributes."
-  value       = {for value in team_project_access.this: value.key => value.id}
+  value       = {for value in tfe_team_project_access.this: value.key => value.id}
 }
