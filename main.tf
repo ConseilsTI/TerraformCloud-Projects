@@ -7,14 +7,14 @@ resource "tfe_project" "this" {
 }
 
 resource "tfe_team" "this" {
-  for_each     = tfe_project.this
-  name         = lower(replace(each.value.name, "/\\W|_|\\s/", "_"))
+  for_each     = toset(var.project_names)
+  name         = lower(replace(each.key, "/\\W|_|\\s/", "_"))
   organization = var.organization_name
   visibility   = "organization"
 }
 
 resource "tfe_team_token" "this" {
-  for_each = tfe_project.this
+  for_each = tfe_team.this
   team_id  = tfe_team.this[each.key].id
 }
 
