@@ -1,7 +1,7 @@
 # The following resource block is used to create project resources.
 
 resource "tfe_project" "this" {
-  for_each     = var.project_names
+  for_each     = toset(var.project_names)
   name         = each.key
   organization = var.organization_name
 }
