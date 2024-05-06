@@ -7,7 +7,7 @@ resource "tfe_project" "this" {
 }
 
 resource "tfe_team" "this" {
-  for_each     = tfe_project.project
+  for_each     = tfe_project.this
   name         = each.value.name
   organization = var.organization_name
   visibility   = "organization"
@@ -15,12 +15,12 @@ resource "tfe_team" "this" {
 }
 
 resource "tfe_team_token" "this" {
-  for_each = tfe_project.project
+  for_each = tfe_project.this
   team_id  = tfe_team.this[each.key].id
 }
 
 resource "tfe_team_project_access" "this" {
-  for_each   = tfe_project.project
+  for_each   = tfe_project.this
   access     = "maintain"
   project_id = tfe_project.this[each.key].id
   team_id    = tfe_team.this[each.key].id
