@@ -75,8 +75,6 @@ The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (> 1.6.0)
 
-- <a name="requirement_github"></a> [github](#requirement\_github) (~>5.44)
-
 - <a name="requirement_hcp"></a> [hcp](#requirement\_hcp) (~>0.76)
 
 - <a name="requirement_tfe"></a> [tfe](#requirement\_tfe) (~>0.51)
@@ -101,17 +99,15 @@ Description: (Required) A list of project names to create.
 
 Type: `list(string)`
 
-## Optional Inputs
-
-The following input variables are optional (have default values):
-
 ### <a name="input_vault_app_name"></a> [vault\_app\_name](#input\_vault\_app\_name)
 
 Description: (Required) The name of the application where the secret will be stored.
 
 Type: `string`
 
-Default: `"TerraformCloud"`
+## Optional Inputs
+
+No optional inputs.
 
 ## Resources
 
@@ -125,7 +121,23 @@ The following resources are used by this module:
 
 ## Outputs
 
-No outputs.
+The following outputs are exported:
+
+### <a name="output_project_id"></a> [project\_id](#output\_project\_id)
+
+Description: The project ID.
+
+### <a name="output_team"></a> [team](#output\_team)
+
+Description: The team resources attributes.
+
+### <a name="output_team_id"></a> [team\_id](#output\_team\_id)
+
+Description: The ID of the team.
+
+### <a name="output_team_project_access"></a> [team\_project\_access](#output\_team\_project\_access)
+
+Description: The team project access attributes.
 
 <!-- markdownlint-disable first-line-h1 -->
 ------
