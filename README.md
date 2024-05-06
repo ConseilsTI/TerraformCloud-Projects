@@ -89,146 +89,34 @@ No modules.
 
 The following input variables are required:
 
-### <a name="input_module_names"></a> [module\_names](#input\_module\_names)
-
-Description: (Required) A list of module names to published.
-
-Type: `list(string)`
-
-### <a name="input_oauth_client_name"></a> [oauth\_client\_name](#input\_oauth\_client\_name)
-
-Description: (Required) The name of the OAuth client.
-
-Type: `string`
-
 ### <a name="input_organization_name"></a> [organization\_name](#input\_organization\_name)
 
 Description: (Required) The name of the Terraform Cloud organization.
 
 Type: `string`
 
-### <a name="input_tfc_api_token"></a> [tfc\_api\_token](#input\_tfc\_api\_token)
+### <a name="input_project_names"></a> [project\_names](#input\_project\_names)
 
-Description:   (Required) The `tfc_api_token` is a block with the following:  
-    secret\_app  : (Optional) The name of the Hashicorp Vault Secrets application where the secret can be found in and can only be used if `value` is not used.  
-    secret\_name : (Optional) The Hashicorp Vault Secrets secret name where the `TFC_API_TOKEN` with permission to managed modules can be found in and can only be used if `value` is not used.  
-    value       : (Optional) The `TFC_API_TOKEN` with permission to managed modules and can only be used if `secret_app` and `secret_name` are not used.
+Description: (Required) A list of project names to create.
 
-Type:
-
-```hcl
-object({
-    secret_app  = optional(string, null)
-    secret_name = optional(string, null)
-    value       = optional(string, null)
-  })
-```
+Type: `list(string)`
 
 ## Optional Inputs
 
-The following input variables are optional (have default values):
-
-### <a name="input_github_enviromnent_variables"></a> [github\_enviromnent\_variables](#input\_github\_enviromnent\_variables)
-
-Description:   (Optional) The `github_enviromnent_variables` is a list of object block with the following:  
-    name        : (Required) The environment variable name required to authenticate with GitHub API.  
-    secret\_app  : (Optional) The name of the Hashicorp Vault Secrets application where the secret can be found in and can only be used if `value` is not used.  
-    secret\_name : (Optional) The Hashicorp Vault Secrets secret name where the environment variable can be found in and can only be used if `value` is not used.  
-    value       : (Optional) The environment variable value required to authenticate with GitHub API and can only be used if `secret_app` and `secret_name` are not used.
-
-Type:
-
-```hcl
-list(object({
-    name        = string
-    secret_app  = optional(string, null)
-    secret_name = optional(string, null)
-    value       = optional(string, null)
-  }))
-```
-
-Default: `null`
-
-### <a name="input_teams"></a> [teams](#input\_teams)
-
-Description:   (Optional) The `teams` is a list of object block with the following:  
-    name        : (Required) The name of the team which will have access to every Terraform module.  
-    create      : (Optional) Whether to create the team.  
-    description : (Optional) A description of the team.  
-    permission  : (Optional) The permissions of team members regarding the repository. Valid values are `pull`, `triage`, `push`, `maintain`, `admin`.
-
-Type:
-
-```hcl
-list(object({
-    name        = string
-    create      = optional(bool, false)
-    description = optional(string, null)
-    permission  = optional(string, "pull")
-  }))
-```
-
-Default: `null`
+No optional inputs.
 
 ## Resources
 
 The following resources are used by this module:
 
-- [github_actions_secret.tfc_api_token](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/actions_secret) (resource)
-- [github_branch_protection.this](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/branch_protection) (resource)
-- [github_repository.this](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/repository) (resource)
-- [github_team.this](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/team) (resource)
-- [github_team_repository.this](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/team_repository) (resource)
-- [terraform_data.github_module_variables](https://registry.terraform.io/providers/hashicorp/terraform/latest/docs/resources/data) (resource)
-- [tfe_registry_module.this](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/registry_module) (resource)
-- [github_team.this](https://registry.terraform.io/providers/integrations/github/latest/docs/data-sources/team) (data source)
-- [hcp_vault_secrets_secret.github_module_variables](https://registry.terraform.io/providers/hashicorp/hcp/latest/docs/data-sources/vault_secrets_secret) (data source)
-- [hcp_vault_secrets_secret.tfc_api_token](https://registry.terraform.io/providers/hashicorp/hcp/latest/docs/data-sources/vault_secrets_secret) (data source)
-- [tfe_oauth_client.client](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/data-sources/oauth_client) (data source)
+- [tfe_project.this](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/project) (resource)
+- [tfe_team.this](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/team) (resource)
+- [tfe_team_project_access.this](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/team_project_access) (resource)
+- [tfe_team_token.this](https://registry.terraform.io/providers/hashicorp/tfe/latest/docs/resources/team_token) (resource)
 
 ## Outputs
 
-The following outputs are exported:
-
-### <a name="output_full_name"></a> [full\_name](#output\_full\_name)
-
-Description: A string of the form "orgname/reponame".
-
-### <a name="output_git_clone_url"></a> [git\_clone\_url](#output\_git\_clone\_url)
-
-Description: URL that can be provided to git clone to clone the repository anonymously via the git protocol.
-
-### <a name="output_html_url"></a> [html\_url](#output\_html\_url)
-
-Description: URL to the repository on the web.
-
-### <a name="output_http_clone_url"></a> [http\_clone\_url](#output\_http\_clone\_url)
-
-Description: URL that can be provided to git clone to clone the repository via HTTPS.
-
-### <a name="output_node_id"></a> [node\_id](#output\_node\_id)
-
-Description: GraphQL global node id for use with v4 API.
-
-### <a name="output_primary_language"></a> [primary\_language](#output\_primary\_language)
-
-Description: The primary language used in the repository.
-
-### <a name="output_repo_id"></a> [repo\_id](#output\_repo\_id)
-
-Description: GitHub ID for the repository.
-
-### <a name="output_repository"></a> [repository](#output\_repository)
-
-Description: Repositories within your GitHub organization.
-
-### <a name="output_ssh_clone_url"></a> [ssh\_clone\_url](#output\_ssh\_clone\_url)
-
-Description: URL that can be provided to git clone to clone the repository via SSH.
-
-### <a name="output_svn_url"></a> [svn\_url](#output\_svn\_url)
-
-Description: URL that can be provided to svn checkout to check out the repository via GitHub's Subversion protocol emulation.
+No outputs.
 
 <!-- markdownlint-disable first-line-h1 -->
 ------
