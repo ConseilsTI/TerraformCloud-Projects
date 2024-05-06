@@ -103,7 +103,15 @@ Type: `list(string)`
 
 ## Optional Inputs
 
-No optional inputs.
+The following input variables are optional (have default values):
+
+### <a name="input_vault_app_name"></a> [vault\_app\_name](#input\_vault\_app\_name)
+
+Description: (Required) The name of the application where the secret will be stored.
+
+Type: `string`
+
+Default: `"TerraformCloud"`
 
 ## Resources
 
