@@ -8,7 +8,7 @@ resource "tfe_project" "this" {
 
 resource "tfe_team" "this" {
   for_each     = tfe_project.this
-  name         = "${lower(replace(each.value.name, "/\\W|_|\\s/", "_"))}"
+  name         = "${lower(replace(each.value.name, "/\\W|_|\\s/", "-"))}"
   organization = var.organization_name
   visibility   = "organization"
 }
