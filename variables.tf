@@ -8,7 +8,11 @@ variable "organization_name" {
   type        = string
 }
 
-
+variable "vault_app_name" {
+  description = "(Required) The name of the application where the secret will be stored."
+  type        = string
+  default     = "TerraformCloud"
+}
 
 
 
