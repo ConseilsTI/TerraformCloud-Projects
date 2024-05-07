@@ -24,8 +24,8 @@ resource "tfe_team_project_access" "this" {
   project_id = tfe_project.this[each.key].id
   team_id    = tfe_team.this[each.key].id
   workspace_access {
-    runs           = "apply"
-    variables      = "write"
+    runs      = "apply"
+    variables = "write"
   }
 }
 
