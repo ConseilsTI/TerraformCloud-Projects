@@ -54,11 +54,8 @@ jobs:
           content_header="Content-Type: application/vnd.api+json"
           echo "INFO     | Building JSON payload."
           project_name="${{ github.event.inputs.project_name }}"
-          echo "${project_name}"
           project_name="${project_name,,}"
-          echo "${project_name}"
           project_name="${project_name//[^a-zA-Z0-9]/_}"
-          echo "${project_name}"
           json_string='{"data":{"type":"teams","attributes":{"name":"'"${project_name}"'","visibility":"organization"}}}'
           json_payload=$(echo "${json_string}" | jq)
           echo "${json_payload}"
@@ -72,6 +69,8 @@ jobs:
               exit 1
             else
               echo "INFO     | Team created."
+              workspace_id=$(echo "$run" | jq -r '."id"')
+              echo "team_id=${team_id}" >> "${GITHUB_OUTPUT}"
             fi
           } ||
           {
@@ -79,3 +78,8 @@ jobs:
             exit 1
           }
           echo ${run}
+
+      - name: Create team token
+        id: create_team_token
+        run: |
+          echo ${{ steps.create_team.outputs.team_id }}
