@@ -69,7 +69,7 @@ jobs:
               exit 1
             else
               echo "INFO     | Team created."
-              workspace_id=$(echo "$run" | jq -r '."id"')
+              workspace_id=$(echo "$run" | jq -r '.data."id"')
               echo "team_id=${team_id}" >> "${GITHUB_OUTPUT}"
             fi
           } ||
