@@ -53,7 +53,7 @@ jobs:
           auth_header="Authorization: Bearer ${TF_API_TOKEN}"
           content_header="Content-Type: application/vnd.api+json"
           echo "INFO     | Building JSON payload."
-          project_name=$(echo "${${{ github.event.inputs.project_name }},,}")
+          project_name=$(echo "${{ github.event.inputs.project_name }},,}")
           project_name=$(sed 's/\W/_/g' <<< "$project_name")
           json_string='{"data":{"type":"teams","attributes":{"name":"'"${project_name}"'","visibility":"organization"}}}'
           json_payload=$(echo "${json_string}" | jq)
