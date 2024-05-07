@@ -20,9 +20,13 @@ resource "tfe_team_token" "this" {
 
 resource "tfe_team_project_access" "this" {
   for_each   = tfe_project.this
-  access     = "maintain"
+  access     = "custom"
   project_id = tfe_project.this[each.key].id
   team_id    = tfe_team.this[each.key].id
+  workspace_access {
+    runs      = "apply"
+    variables = "write"
+  }
 }
 
 # The following code blode is used to create secret in Hashicorp Vault.
