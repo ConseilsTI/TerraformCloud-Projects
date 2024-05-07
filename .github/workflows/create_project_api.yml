@@ -1,0 +1,47 @@
+name: "Create Terraform Project"
+
+on: # yamllint disable-line rule:truthy
+  workflow_dispatch:
+    inputs:
+      project_name:
+        description: The name of the project to create.
+        required: true
+        type: string
+
+jobs:
+  job:
+    name: Create Terraform Project
+    runs-on: ubuntu-latest
+    env:
+      TF_API_TOKEN: ${{ secrets.TFC_API_TOKEN }}
+      TF_CLOUD_ORGANIZATION: ConseilsTI
+      TF_VARIABLE: project_names
+    steps:
+
+      - name: Get variable
+        id: get_variable
+        run: |
+          echo "INFO     | Building required variables."
+          tfc_api_url="https://app.terraform.io/api/v2"
+          auth_header="Authorization: Bearer ${TF_API_TOKEN}"
+          content_header="Content-Type: application/vnd.api+json"
+          echo "INFO     | Building JSON payload."
+          json_string='{"data":{"attributes":{"name":"'"${{ github.event.inputs.project_name }}"'"},"type": "projects"}}'
+          json_payload=$(echo "${json_string}" | jq)
+          echo "INFO     | Running API call to create project."
+          {
+            run=$(curl -sS --request PPOST --url "${tfc_api_url}/organizations/${{ env.TF_CLOUD_ORGANIZATION }}/projects" \
+            --header "${auth_header}" --header "${content_header}" --data "${json_payload}")
+            if ! [[ "${run}" =~ "{\"data\":" ]]; then
+              echo "ERROR    | Unable to create project."
+              echo "${run}"
+              exit 1
+            else
+              echo "INFO     | Project created."
+            fi
+          } ||
+          {
+            echo "ERROR    | Unable to create project."
+            exit 1
+          }
+          
