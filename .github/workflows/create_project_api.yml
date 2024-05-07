@@ -55,9 +55,9 @@ jobs:
           echo "INFO     | Building JSON payload."
           project_name="${{ github.event.inputs.project_name }}"
           echo "${project_name}"
-          project_name=$(echo "${project_name,,}")
+          project_name="${project_name,,}"
           echo "${project_name}"
-          project_name=$(sed 's/\W/_/g' <<< "$project_name")
+          project_name="${project_name//\W/_}"
           echo "${project_name}"
           json_string='{"data":{"type":"teams","attributes":{"name":"'"${project_name}"'","visibility":"organization"}}}'
           json_payload=$(echo "${json_string}" | jq)
