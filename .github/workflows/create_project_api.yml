@@ -18,8 +18,8 @@ jobs:
       TF_VARIABLE: project_names
     steps:
 
-      - name: Get variable
-        id: get_variable
+      - name: Create project
+        id: create_project
         run: |
           echo "INFO     | Building required variables."
           tfc_api_url="https://app.terraform.io/api/v2"
@@ -44,4 +44,92 @@ jobs:
             echo "ERROR    | Unable to create project."
             exit 1
           }
-          
+          project_id=$(echo "$run" | jq -r '.data."id"')
+          echo "project_id=${project_id}" >> "${GITHUB_OUTPUT}"
+
+      - name: Create team
+        id: create_team
+        run: |
+          echo "INFO     | Building required variables."
+          tfc_api_url="https://app.terraform.io/api/v2"
+          auth_header="Authorization: Bearer ${TF_API_TOKEN}"
+          content_header="Content-Type: application/vnd.api+json"
+          echo "INFO     | Building JSON payload."
+          project_name="${{ github.event.inputs.project_name }}"
+          project_name="${project_name,,}"
+          project_name="${project_name//[^a-zA-Z0-9]/_}"
+          json_string='{"data":{"type":"teams","attributes":{"name":"'"${project_name}"'","visibility":"organization"}}}'
+          json_payload=$(echo "${json_string}" | jq)
+          echo "INFO     | Running API call to create team."
+          {
+            run=$(curl -sS --request POST --url "${tfc_api_url}/organizations/${{ env.TF_CLOUD_ORGANIZATION }}/teams" \
+            --header "${auth_header}" --header "${content_header}" --data "${json_payload}")
+            if ! [[ "${run}" =~ "{\"data\":" ]]; then
+              echo "ERROR    | Unable to create team."
+              echo "${run}"
+              exit 1
+            else
+              echo "INFO     | Team created."
+            fi
+          } ||
+          {
+            echo "ERROR    | Unable to create team."
+            exit 1
+          }
+          team_id=$(echo "$run" | jq -r '.data."id"')
+          echo "team_id=${team_id}" >> "${GITHUB_OUTPUT}"
+
+      - name: Create team token
+        id: create_team_token
+        run: |
+          echo "INFO     | Building required variables."
+          tfc_api_url="https://app.terraform.io/api/v2"
+          auth_header="Authorization: Bearer ${TF_API_TOKEN}"
+          content_header="Content-Type: application/vnd.api+json"
+          echo "INFO     | Building JSON payload."
+          json_string='{"data":{"type":"authentication-token"}}'
+          json_payload=$(echo "${json_string}" | jq)
+          echo "INFO     | Running API call to create team token."
+          {
+            run=$(curl -sS --request POST --url "${tfc_api_url}/teams/${{ steps.create_team.outputs.team_id }}/authentication-token" \
+            --header "${auth_header}" --header "${content_header}" --data "${json_payload}")
+            if ! [[ "${run}" =~ "{\"data\":" ]]; then
+              echo "ERROR    | Unable to create team token."
+              echo "${run}"
+              exit 1
+            else
+              echo "INFO     | Team token created."
+            fi
+          } ||
+          {
+            echo "ERROR    | Unable to create team token."
+            exit 1
+          }
+          token=$(echo "$run" | jq -r '.data.attributes."token"')
+          echo "INFO     | Token: ${token}"
+
+      - name: Create team project access
+        run: |
+          echo "INFO     | Building required variables."
+          tfc_api_url="https://app.terraform.io/api/v2"
+          auth_header="Authorization: Bearer ${TF_API_TOKEN}"
+          content_header="Content-Type: application/vnd.api+json"
+          echo "INFO     | Building JSON payload."
+          json_string='{"data":{"attributes":{"access":"custom","workspace-access":{"runs":"apply","variables":"write"}},"relationships":{"project":{"data":{"type":"projects","id":"'"${{ steps.create_project.outputs.project_id }}"'"}},"team":{"data":{"type":"teams","id":"'"${{ steps.create_team.outputs.team_id }}"'"}}},"type": "team-projects"}}'
+          json_payload=$(echo "${json_string}" | jq)
+          echo "INFO     | Running API call to create team project access."
+          {
+            run=$(curl -sS --request POST --url "${tfc_api_url}/team-projects" \
+            --header "${auth_header}" --header "${content_header}" --data "${json_payload}")
+            if ! [[ "${run}" =~ "{\"data\":" ]]; then
+              echo "ERROR    | Unable to create team project access."
+              echo "${run}"
+              exit 1
+            else
+              echo "INFO     | Team project access created."
+            fi
+          } ||
+          {
+            echo "ERROR    | Unable to create team project access."
+            exit 1
+          }
