@@ -58,7 +58,6 @@ jobs:
           project_name="${project_name//[^a-zA-Z0-9]/_}"
           json_string='{"data":{"type":"teams","attributes":{"name":"'"${project_name}"'","visibility":"organization"}}}'
           json_payload=$(echo "${json_string}" | jq)
-          echo "${json_payload}"
           echo "INFO     | Running API call to create team."
           {
             run=$(curl -sS --request POST --url "${tfc_api_url}/organizations/${{ env.TF_CLOUD_ORGANIZATION }}/teams" \
@@ -75,12 +74,33 @@ jobs:
             echo "ERROR    | Unable to create team."
             exit 1
           }
-          echo ${run}
           team_id=$(echo "$run" | jq -r '.data."id"')
-          echo "${team_id}"
           echo "team_id=${team_id}" >> "${GITHUB_OUTPUT}"
 
       - name: Create team token
         id: create_team_token
         run: |
-          echo ${{ steps.create_team.outputs.team_id }}
+          echo "INFO     | Building required variables."
+          tfc_api_url="https://app.terraform.io/api/v2"
+          auth_header="Authorization: Bearer ${TF_API_TOKEN}"
+          content_header="Content-Type: application/vnd.api+json"
+          echo "INFO     | Building JSON payload."
+          json_string='{"data":{"type":"authentication-token"}}'
+          json_payload=$(echo "${json_string}" | jq)
+          echo "INFO     | Running API call to create team token."
+          {
+            run=$(curl -sS --request POST --url "${tfc_api_url}/teams/${{ steps.create_team.outputs.team_id }}/authentication-token" \
+            --header "${auth_header}" --header "${content_header}" --data "${json_payload}")
+            if ! [[ "${run}" =~ "{\"data\":" ]]; then
+              echo "ERROR    | Unable to create team token."
+              echo "${run}"
+              exit 1
+            else
+              echo "INFO     | Team token created."
+            fi
+          } ||
+          {
+            echo "ERROR    | Unable to create team token."
+            exit 1
+          }
+          echo "${run}"
