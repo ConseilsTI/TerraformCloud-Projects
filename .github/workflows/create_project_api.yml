@@ -57,7 +57,7 @@ jobs:
           echo "${project_name}"
           project_name="${project_name,,}"
           echo "${project_name}"
-          project_name="${project_name//\W/_}"
+          project_name="${project_name//[^a-zA-Z0-9]/_}"
           echo "${project_name}"
           json_string='{"data":{"type":"teams","attributes":{"name":"'"${project_name}"'","visibility":"organization"}}}'
           json_payload=$(echo "${json_string}" | jq)
