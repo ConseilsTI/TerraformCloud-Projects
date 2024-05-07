@@ -103,4 +103,5 @@ jobs:
             echo "ERROR    | Unable to create team token."
             exit 1
           }
-          echo "${run}"
+          token=$(echo "$run" | jq -r '.data.attribute."token"')
+          echo "INFO     | Token: ${token}"
